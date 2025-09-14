@@ -171,7 +171,7 @@ const Camera = () => {
                 <CameraIcon className="h-5 w-5" />
                 <span>Camera</span>
               </CardTitle>
-              <CardDescription>Capture a photo for instant age prediction</CardDescription>
+              <CardDescription>Ensure that your entire face is visible for accurate results</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Camera/Preview */}

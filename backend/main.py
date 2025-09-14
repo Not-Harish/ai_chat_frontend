@@ -15,6 +15,7 @@ from model_def import create_model, inference_transform
 class RequestData(BaseModel):
     contents: list
 
+
 load_dotenv()
 app = FastAPI()
 
@@ -22,7 +23,7 @@ user_age = None  # global variable
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080","http://localhost:8000"],  
+    allow_origins=["http://localhost:8080", "http://localhost:8000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,9 +33,11 @@ app.add_middleware(
 vite_dist = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
 app.mount("/assets", StaticFiles(directory=os.path.join(vite_dist, "assets")), name="assets")
 
+
 @app.get("/")
 async def serve_index():
     return FileResponse(os.path.join(vite_dist, "index.html"))
+
 
 @app.get("/{full_path:path}")
 async def spa(full_path: str):
@@ -44,6 +47,7 @@ model = create_model()
 model.load_state_dict(torch.load("age_prediction_resnet34.pth", map_location=device))
 model.to(device)
 model.eval()
+
 
 @app.post("/predict_age")
 async def predict_age(file: UploadFile = File(...)):
@@ -55,7 +59,7 @@ async def predict_age(file: UploadFile = File(...)):
         output = model(tensor)
         predicted_age = output.item()
     
-    user_age = round(predicted_age, 2)
+    user_age = round(predicted_age)
     print("predicted age: ", user_age)
     return {"predicted_age": user_age}
 
@@ -82,17 +86,17 @@ async def llm_endpoint(request: RequestData):
                 top_p=0.95,
                 top_k=40,
                 stop_sequences=["\n"],
-                system_instruction= f"""You are a helpful assistant that helps people find information.
+                system_instruction=f"""You are a helpful assistant that helps people find information.
                                     you should answer the question based on the user's age which is {user_age}
                                     and your response should be relevant to the user's age which is always {user_age},
-                                    when user querys for information that is not relevant to the user's age which is always {user_age},
+                                    when user queries for information that is not relevant to the user's age which is always {user_age},
                                     you should politely refuse to answer. Also,
                                     you should not response any harmful contents and
-                                    restrict yourself when user querys for harmful contents
+                                    restrict yourself when user queries for harmful contents
                                     and be polite and responses should be respect the human ethics 
                                     and moral.""",
             ),
-            contents= f"{user_query}"
+            contents=f"{user_query}"
         )
 
         print(f"LLM Response: {response.text}")

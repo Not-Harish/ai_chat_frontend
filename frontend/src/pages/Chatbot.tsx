@@ -18,7 +18,7 @@ const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      content: "Hello! I'm your AI assistant for age prediction analysis. I can help you understand your results, answer questions about age estimation, or discuss anything related to the analysis. How can I help you today?",
+      content: "Hello! I'm your AI assistant. How can I help you today?",
       role: 'assistant',
       timestamp: new Date()
     }
@@ -95,15 +95,6 @@ const Chatbot = () => {
         setIsLoading(false);
         });
 
-        // const assistantMessage: Message = {
-        //   id: (Date.now() + 1).toString(),
-        //   content: responses[Math.floor(Math.random() * responses.length)],
-        //   role: 'assistant',
-        //   timestamp: new Date()
-        // };
-
-        // setMessages(prev => [...prev, assistantMessage]);
-        // setIsLoading(false);
       }, 1000 + Math.random() * 2000);
 
     } catch (error) {
@@ -146,14 +137,14 @@ const Chatbot = () => {
         <div className="max-w-4xl mx-auto h-full flex flex-col">
           <div className="text-center mb-6">
             <h1 className="text-3xl font-bold gradient-text mb-2">AI Assistant</h1>
-            <p className="text-muted-foreground">Chat with our AI about age prediction and analysis</p>
+            <p className="text-muted-foreground">Chat with our righteous generative engine</p>
           </div>
 
           <Card className="glass-morphism flex-1 flex flex-col">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Bot className="h-5 w-5" />
-                <span>Age Prediction Assistant</span>
+                <span>Age Assistant</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col p-0">
@@ -221,7 +212,7 @@ const Chatbot = () => {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="Ask me anything about age prediction..."
+                    placeholder="Ask me anything..."
                     disabled={isLoading}
                     className="flex-1"
                   />
@@ -234,7 +225,7 @@ const Chatbot = () => {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2 text-center">
-                  Press Enter to send • AI responses are simulated
+                  Press Enter to send • AI responses are generated
                 </p>
               </div>
             </CardContent>

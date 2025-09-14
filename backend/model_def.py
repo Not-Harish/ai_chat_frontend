@@ -2,11 +2,13 @@ import torch
 import torch.nn as nn
 from torchvision import models, transforms
 
+
 def create_model():
     model = models.resnet34(weights='IMAGENET1K_V1')
     num_features = model.fc.in_features
     model.fc = nn.Linear(num_features, 1)
     return model
+
 
 # preprocessing for inference
 inference_transform = transforms.Compose([
