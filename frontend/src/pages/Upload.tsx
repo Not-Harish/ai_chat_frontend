@@ -253,6 +253,13 @@ const Upload = () => {
                         Analyze Image
                       </Button>
                     )}
+                    {result && !isAnalyzing && (
+                      <Link to="/chatbot" className="flex-1">
+                        <Button className="w-full bg-gradient-to-r from-accent to-blue-500 hover:from-accent/90 hover:to-blue-500/90">
+                          Chat with AI
+                        </Button>
+                      </Link>
+                    )}
                     <Button 
                       variant="outline" 
                       onClick={handleReset}

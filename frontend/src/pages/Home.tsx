@@ -23,7 +23,7 @@ const Home = () => {
       <main className="flex-1 flex items-center justify-center px-6">
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <div className="space-y-4">
-            <h1 className="text-6xl md:text-7xl font-bold gradient-text leading-tight">
+            <h1 className="text-6xl md:text-7xl font-bold gradient-text" style={{ lineHeight: '1.25' }}>
               AI Age Prediction
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
@@ -38,9 +38,9 @@ const Home = () => {
                 <Zap className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Button variant="outline" size="lg" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground px-8 py-4 text-lg">
+            {/* <Button variant="outline" size="lg" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground px-8 py-4 text-lg">
               Learn More
-            </Button>
+            </Button> */}
           </div>
 
           {/* Features Preview */}
@@ -70,7 +70,7 @@ const Home = () => {
 
       {/* Footer */}
       <footer className="p-6 text-center text-muted-foreground">
-        <p>&copy; 2024 AgePredict. Powered by advanced AI technology.</p>
+        <p>&copy; 2025 AgePredict. Powered by advanced AI technology.</p>
       </footer>
     </div>
   );

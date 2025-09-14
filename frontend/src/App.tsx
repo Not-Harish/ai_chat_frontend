@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Upload from "./pages/Upload";
 import Camera from "./pages/Camera";
+import Chatbot from "./pages/Chatbot";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/upload" element={<Upload />} />
           <Route path="/camera" element={<Camera />} />
+          <Route path="/chatbot" element={<Chatbot />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

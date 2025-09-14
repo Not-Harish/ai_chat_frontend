@@ -1,47 +1,92 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Brain, Mail, Lock, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { auth } from "@/firebase";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
+
+const getFriendlyErrorMessage = (code: string) => {
+  switch (code) {
+    case "auth/user-not-found":
+      return "No account found with this email.";
+    case "auth/wrong-password":
+      return "Incorrect password. Please try again.";
+    case "auth/invalid-email":
+      return "Please enter a valid email address.";
+    case "auth/email-already-in-use":
+      return "This email is already registered. Please login.";
+    case "auth/weak-password":
+      return "Password should be at least 6 characters.";
+    default:
+      return "Something went wrong. Please try again.";
+  }
+};
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    const email = (document.getElementById("email") as HTMLInputElement).value;
+    const password = (document.getElementById("password") as HTMLInputElement).value;
+
     setIsLoading(true);
-    
-    // Simulate login - in real app, this would connect to Supabase
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       toast({
         title: "Login successful!",
-        description: "Redirecting to dashboard...",
+        description: "Welcome back!",
       });
-      // Navigate to dashboard - you'll need Supabase for real auth
-      window.location.href = "/dashboard";
-    }, 1500);
+      navigate("/dashboard");
+    } catch (error: any) {
+      toast({
+        title: "Authentication Error",
+        description: getFriendlyErrorMessage(error.code),
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    const email = (document.getElementById("signup-email") as HTMLInputElement).value;
+    const password = (document.getElementById("signup-password") as HTMLInputElement).value;
+
     setIsLoading(true);
-    
-    // Simulate signup - in real app, this would connect to Supabase
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
       toast({
         title: "Account created!",
-        description: "Welcome to AgePredict. Redirecting...",
+        description: "Welcome to AgePredict!",
       });
-      // Navigate to dashboard - you'll need Supabase for real auth
-      window.location.href = "/dashboard";
-    }, 1500);
+      navigate("/dashboard");
+    } catch (error: any) {
+      toast({
+        title: "Sign-up Error",
+        description: getFriendlyErrorMessage(error.code),
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -72,16 +117,17 @@ const Login = () => {
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="signup">Sign Up</TabsTrigger>
               </TabsList>
-              
+
+              {/* ---------- LOGIN ---------- */}
               <TabsContent value="login">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        id="email" 
-                        type="email" 
+                      <Input
+                        id="email"
+                        type="email"
                         placeholder="Enter your email"
                         className="pl-10"
                         required
@@ -92,17 +138,17 @@ const Login = () => {
                     <Label htmlFor="password">Password</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        id="password" 
-                        type="password" 
+                      <Input
+                        id="password"
+                        type="password"
                         placeholder="Enter your password"
                         className="pl-10"
                         required
                       />
                     </div>
                   </div>
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
                     disabled={isLoading}
                   >
@@ -110,16 +156,17 @@ const Login = () => {
                   </Button>
                 </form>
               </TabsContent>
-              
+
+              {/* ---------- SIGNUP ---------- */}
               <TabsContent value="signup">
                 <form onSubmit={handleSignup} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name</Label>
                     <div className="relative">
                       <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        id="name" 
-                        type="text" 
+                      <Input
+                        id="name"
+                        type="text"
                         placeholder="Enter your full name"
                         className="pl-10"
                         required
@@ -130,9 +177,9 @@ const Login = () => {
                     <Label htmlFor="signup-email">Email</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        id="signup-email" 
-                        type="email" 
+                      <Input
+                        id="signup-email"
+                        type="email"
                         placeholder="Enter your email"
                         className="pl-10"
                         required
@@ -143,17 +190,17 @@ const Login = () => {
                     <Label htmlFor="signup-password">Password</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        id="signup-password" 
-                        type="password" 
+                      <Input
+                        id="signup-password"
+                        type="password"
                         placeholder="Create a password"
                         className="pl-10"
                         required
                       />
                     </div>
                   </div>
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     className="w-full bg-gradient-to-r from-accent to-blue-500 hover:from-accent/90 hover:to-blue-500/90"
                     disabled={isLoading}
                   >
@@ -166,7 +213,10 @@ const Login = () => {
         </Card>
 
         <div className="text-center mt-6">
-          <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            to="/"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
             ← Back to Home
           </Link>
         </div>

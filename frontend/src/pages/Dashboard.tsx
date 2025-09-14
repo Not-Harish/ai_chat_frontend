@@ -18,14 +18,14 @@ const Dashboard = () => {
           <span className="text-2xl font-bold gradient-text">AgePredict</span>
         </div>
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="sm">
+          {/* <Button variant="ghost" size="sm">
             <History className="h-4 w-4 mr-2" />
             History
-          </Button>
-          <Button variant="ghost" size="sm">
+          </Button> */}
+          {/* <Button variant="ghost" size="sm">
             <User className="h-4 w-4 mr-2" />
             Profile
-          </Button>
+          </Button> */}
           <Button variant="outline" size="sm" onClick={handleLogout}>
             <LogOut className="h-4 w-4 mr-2" />
             Logout
@@ -38,7 +38,7 @@ const Dashboard = () => {
         <div className="max-w-4xl mx-auto">
           {/* Welcome Section */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold gradient-text mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold gradient-text mb-4 leading-tight md:leading-tight">
               Welcome to AgePredict
             </h1>
             <p className="text-xl text-muted-foreground">
@@ -99,7 +99,7 @@ const Dashboard = () => {
             </Link>
           </div>
 
-          {/* Recent Predictions */}
+          {/* Recent Predictions
           <div className="mt-16">
             <h2 className="text-2xl font-bold mb-6">Recent Predictions</h2>
             <Card className="glass-morphism">
@@ -111,7 +111,7 @@ const Dashboard = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
+          </div> */}
         </div>
       </main>
     </div>

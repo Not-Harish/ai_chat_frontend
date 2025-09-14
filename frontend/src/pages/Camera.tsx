@@ -12,8 +12,8 @@ const Camera = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<number | null>(null);
-  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
-  
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -22,19 +22,14 @@ const Camera = () => {
   const startCamera = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { 
-          facingMode: facingMode,
-          width: { ideal: 640 },
-          height: { ideal: 480 }
-        }
+        video: { facingMode: facingMode, width: { ideal: 640 }, height: { ideal: 480 } },
       });
-      
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
         setIsStreaming(true);
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Camera access denied",
         description: "Please allow camera access to use this feature",
@@ -45,7 +40,7 @@ const Camera = () => {
 
   const stopCamera = useCallback(() => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
     setIsStreaming(false);
@@ -53,31 +48,27 @@ const Camera = () => {
 
   const capturePhoto = useCallback(() => {
     if (!videoRef.current || !canvasRef.current) return;
-
     const canvas = canvasRef.current;
     const video = videoRef.current;
-    const context = canvas.getContext('2d');
-
+    const context = canvas.getContext("2d");
     if (!context) return;
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    
-    // Flip the image if using front camera
-    if (facingMode === 'user') {
+
+    if (facingMode === "user") {
       context.scale(-1, 1);
       context.translate(-canvas.width, 0);
     }
-    
     context.drawImage(video, 0, 0);
-    
-    const imageDataUrl = canvas.toDataURL('image/jpeg');
+
+    const imageDataUrl = canvas.toDataURL("image/jpeg");
     setCapturedImage(imageDataUrl);
     stopCamera();
   }, [facingMode, stopCamera]);
 
   const switchCamera = useCallback(() => {
-    setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
+    setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
     if (isStreaming) {
       stopCamera();
       setTimeout(startCamera, 100);
@@ -89,8 +80,9 @@ const Camera = () => {
 
     setIsAnalyzing(true);
     setProgress(0);
+    setResult(null);
 
-    // Simulate progress
+    // progress simulation
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 90) {
@@ -102,37 +94,39 @@ const Camera = () => {
     }, 200);
 
     try {
-      // Convert data URL to blob for upload
-      const response = await fetch(capturedImage);
-      const blob = await response.blob();
-      
-      // Simulate API call to your FastAPI backend
+      // Convert the base64 data URL to a Blob
+      const imgResp = await fetch(capturedImage);
+      const blob = await imgResp.blob();
       const formData = new FormData();
-      formData.append('file', blob, 'camera-capture.jpg');
+      formData.append("file", blob, "camera-capture.jpg");
 
-      // Simulated response - replace with actual API call
-      setTimeout(() => {
-        clearInterval(progressInterval);
-        setProgress(100);
-        
-        // Simulate random age prediction (replace with actual API response)
-        const predictedAge = Math.floor(Math.random() * 50) + 20;
-        setResult(predictedAge);
-        setIsAnalyzing(false);
-        
-        toast({
-          title: "Analysis complete!",
-          description: `Predicted age: ${predictedAge} years`,
-        });
-      }, 2000);
+      // Actual API call to FastAPI backend
+      const response = await fetch("http://localhost:8000/predict_age", {
+        method: "POST",
+        body: formData,
+      });
 
-    } catch (error) {
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      clearInterval(progressInterval);
+      setProgress(100);
+      setResult(data.predicted_age);
+      setIsAnalyzing(false);
+
+      toast({
+        title: "Analysis complete!",
+        description: `Predicted age: ${data.predicted_age} years`,
+      });
+    } catch (error: any) {
       clearInterval(progressInterval);
       setIsAnalyzing(false);
       setProgress(0);
       toast({
         title: "Analysis failed",
-        description: "Please try again or check your connection",
+        description: error.message || "Please try again or check your connection",
         variant: "destructive",
       });
     }
@@ -177,12 +171,10 @@ const Camera = () => {
                 <CameraIcon className="h-5 w-5" />
                 <span>Camera</span>
               </CardTitle>
-              <CardDescription>
-                Capture a photo for instant age prediction
-              </CardDescription>
+              <CardDescription>Capture a photo for instant age prediction</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Camera/Preview Area */}
+              {/* Camera/Preview */}
               <div className="relative bg-black rounded-lg overflow-hidden">
                 {!capturedImage ? (
                   <>
@@ -191,8 +183,10 @@ const Camera = () => {
                       autoPlay
                       playsInline
                       muted
-                      className={`w-full h-64 md:h-80 object-cover ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`}
-                      style={{ display: isStreaming ? 'block' : 'none' }}
+                      className={`w-full h-64 md:h-80 object-cover ${
+                        facingMode === "user" ? "scale-x-[-1]" : ""
+                      }`}
+                      style={{ display: isStreaming ? "block" : "none" }}
                     />
                     {!isStreaming && (
                       <div className="w-full h-64 md:h-80 flex items-center justify-center">
@@ -206,11 +200,7 @@ const Camera = () => {
                   </>
                 ) : (
                   <div className="relative">
-                    <img
-                      src={capturedImage}
-                      alt="Captured"
-                      className="w-full h-64 md:h-80 object-cover"
-                    />
+                    <img src={capturedImage} alt="Captured" className="w-full h-64 md:h-80 object-cover" />
                     {isAnalyzing && (
                       <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                         <div className="text-center text-white">
@@ -227,7 +217,7 @@ const Camera = () => {
               {!capturedImage && (
                 <div className="flex justify-center space-x-3">
                   {!isStreaming ? (
-                    <Button 
+                    <Button
                       onClick={startCamera}
                       className="bg-gradient-to-r from-accent to-blue-500 hover:from-accent/90 hover:to-blue-500/90"
                     >
@@ -236,7 +226,11 @@ const Camera = () => {
                     </Button>
                   ) : (
                     <>
-                      <Button onClick={capturePhoto} size="lg" className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90">
+                      <Button
+                        onClick={capturePhoto}
+                        size="lg"
+                        className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
+                      >
                         <CameraIcon className="h-4 w-4 mr-2" />
                         Capture Photo
                       </Button>
@@ -252,7 +246,7 @@ const Camera = () => {
                 </div>
               )}
 
-              {/* Analysis Progress */}
+              {/* Progress */}
               {isAnalyzing && (
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
@@ -263,19 +257,13 @@ const Camera = () => {
                 </div>
               )}
 
-              {/* Results */}
+              {/* Result */}
               {result !== null && !isAnalyzing && (
                 <Card className="bg-primary/5 border-primary/20">
                   <CardContent className="p-6 text-center">
-                    <h3 className="text-2xl font-bold gradient-text mb-2">
-                      Predicted Age
-                    </h3>
-                    <p className="text-4xl font-bold text-primary mb-2">
-                      {result} years
-                    </p>
-                    <p className="text-muted-foreground">
-                      Analysis completed with high confidence
-                    </p>
+                    <h3 className="text-2xl font-bold gradient-text mb-2">Predicted Age</h3>
+                    <p className="text-4xl font-bold text-primary mb-2">{result} years</p>
+                    <p className="text-muted-foreground">Analysis completed with high confidence</p>
                   </CardContent>
                 </Card>
               )}
@@ -290,6 +278,13 @@ const Camera = () => {
                     >
                       Analyze Photo
                     </Button>
+                  )}
+                  {result && !isAnalyzing && (
+                    <Link to="/chatbot" className="flex-1">
+                      <Button className="w-full bg-gradient-to-r from-accent to-blue-500 hover:from-accent/90 hover:to-blue-500/90">
+                        Chat with AI
+                      </Button>
+                    </Link>
                   )}
                   <Button 
                     variant="outline" 
